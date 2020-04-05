@@ -7,54 +7,72 @@
 
 const canvasSketch = require("canvas-sketch");
 const { polylinesToSVG } = require("canvas-sketch-util/penplot");
-const pickRandom = require("canvas-sketch-util/random");
-const palettes = require("nice-color-palettes");
+// const pickRandom = require("canvas-sketch-util/random");
+// const palettes = require("nice-color-palettes");
 
 const lines = [];
+const tree = [
+  [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], // 1 - 1
+  [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0], // 2 - 3
+  [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0], // 3 - 5
+  [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0], // 4 - 3
+  [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0], // 5 - 5
+  [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0], // 6 - 7
+  [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0], // 7 - 5
+  [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0], // 8 - 7
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0], // 9 - 9
+  [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0], // 10 - 7
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0], // 11 - 9
+  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], // 12 - 11
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 13 - 13
+  [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], // 14 - 3
+  [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], // 15 - 3
+  [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0] // 16 - 3
+];
 
 const settings = {
-  dimensions: "A4",
+  dimensions: [5, 7],
   orientation: "portrait",
   pixelsPerInch: 300,
   scaleToView: true,
-  units: "cm"
+  units: "in"
 };
 
-let columns = 8;
-let rows = 14;
+let columns = 13;
+let rows = 16;
 
 // function to generate a random number between min and max
 const random = (min, max) => Math.random() * (max - min) + min;
-const palette = pickRandom.pick(palettes);
+// const palette = pickRandom.pick(palettes);
 
-const generatePosition = position => {
+const getPosition = position => {
   const [row, col] = position;
   return row * columns + col;
 };
 
-var size = columns * rows;
-var rainbow = new Array(size);
+const size = columns * rows;
+const rainbow = new Array(size);
 
-for (var i = 0; i < size; i++) {
-  var red = sin_to_hex(i, (0 * Math.PI * 2) / 3); // 0   deg
-  var blue = sin_to_hex(i, (1 * Math.PI * 2) / 3); // 120 deg
-  var green = sin_to_hex(i, (2 * Math.PI * 2) / 3); // 240 deg
+for (let i = 0; i < size; i++) {
+  const red = sin_to_hex(i, (0 * Math.PI * 2) / 3); // 0   deg
+  const blue = sin_to_hex(i, (1 * Math.PI * 2) / 3); // 120 deg
+  const green = sin_to_hex(i, (2 * Math.PI * 2) / 3); // 240 deg
 
   rainbow[i] = "#" + red + green + blue;
 }
 
 function sin_to_hex(i, phase = 120) {
-  var sin = Math.sin((Math.PI / size) * 2 * i + phase);
-  var int = Math.floor(sin * 127) + 128;
-  var hex = int.toString(16);
+  const sin = Math.sin((Math.PI / size) * 2 * i + phase);
+  const int = Math.floor(sin * 127) + 128;
+  const hex = int.toString(16);
 
   return hex.length === 1 ? "0" + hex : hex;
 }
 
 const sketch = context => {
   let marginBetweenElements = 0.05;
-  let elementWidth = 1.5;
-  let elementHeight = 1.5;
+  let elementWidth = 0.25;
+  let elementHeight = 0.25;
 
   // position drawing in center of page
   let drawingWidth =
@@ -72,14 +90,14 @@ const sketch = context => {
       let move = 0;
       if (r >= 2) {
         angle = random(-r, r); // introduce a random rotation
-        move = random(0, r * 0.1); // introduce a random movement
+        move = random(0, r * 0.025); // introduce a random movement
       }
       o[r].push({ angle, move });
     }
   }
 
   return ({ context, width, height, units }) => {
-    // white background
+    // black background
     context.fillStyle = "black";
     context.fillRect(0, 0, width, height);
 
@@ -120,7 +138,7 @@ const sketch = context => {
   function rotate(cx, cy, x, y, angle) {
     if (angle === 0) return [x, y];
 
-    var radians = (Math.PI / 180) * angle,
+    const radians = (Math.PI / 180) * angle,
       cos = Math.cos(radians),
       sin = Math.sin(radians),
       nx = cos * (x - cx) - sin * (y - cy) + cx,
@@ -138,12 +156,17 @@ const sketch = context => {
     let xy3 = rotate(cx, cy, cx + width, cy + width, angle);
     let xy4 = rotate(cx, cy, cx, cy + width, angle);
 
-    const getPosition = generatePosition(position);
+    const pos = getPosition(position);
+    const [x, y] = position;
+    console.log(position);
+    if (tree[x][y] === 0) {
+      return;
+    }
 
     context.beginPath();
     // context.strokeStyle = palette[Math.floor(random(1, 4))];
-    context.strokeStyle = rainbow[getPosition];
-    context.lineWidth = 0.04;
+    context.strokeStyle = rainbow[pos];
+    context.lineWidth = 0.01;
     context.lineCap = "square";
     context.lineJoin = "miter";
 
