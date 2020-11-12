@@ -5,28 +5,28 @@
  * @author Stephane Tombeur (https://github.com/stombeur)
  */
 
-const canvasSketch = require('canvas-sketch');
-const { polylinesToSVG } = require('canvas-sketch-util/penplot');
+const canvasSketch = require("canvas-sketch");
+const { pathsToSVG } = require("canvas-sketch-util/penplot");
 
 const lines = [];
 
 const settings = {
   dimensions: [11, 14],
-  orientation: 'portrait',
+  orientation: "portrait",
   pixelsPerInch: 300,
   scaleToView: true,
-  units: 'in'
+  units: "in",
 };
 
 // function to generate a random number between min and max
 const random = (min, max) => Math.random() * (max - min) + min;
 
-const sketch = context => {
-  let marginBetweenElements = 0.05;
-  let elementWidth = 0.35;
-  let elementHeight = 0.35;
-  let columns = 20;
-  let rows = 28;
+const sketch = (context) => {
+  let marginBetweenElements = 0.075;
+  let elementWidth = 0.65;
+  let elementHeight = 0.65;
+  let columns = 10;
+  let rows = 14;
 
   // position drawing in center of page
   let drawingWidth =
@@ -52,7 +52,7 @@ const sketch = context => {
 
   return ({ context, width, height, units }) => {
     // white background
-    context.fillStyle = 'white';
+    context.fillStyle = "white";
     context.fillRect(0, 0, width, height);
 
     let posX = marginPageLeft;
@@ -76,13 +76,13 @@ const sketch = context => {
     return [
       context.canvas,
       {
-        data: polylinesToSVG(lines, {
+        data: pathsToSVG(lines, {
           width,
           height,
-          units
+          units,
         }),
-        extension: '.svg'
-      }
+        extension: ".svg",
+      },
     ];
   };
 
@@ -109,10 +109,10 @@ const sketch = context => {
     let xy4 = rotate(cx, cy, cx, cy + width, angle);
 
     context.beginPath();
-    context.strokeStyle = 'black';
+    context.strokeStyle = "black";
     context.lineWidth = 0.02;
-    context.lineCap = 'square';
-    context.lineJoin = 'miter';
+    context.lineCap = "square";
+    context.lineJoin = "miter";
 
     // draw square on context
     context.moveTo(...xy1);
