@@ -84,7 +84,7 @@ export class Kruskals {
   }
 }
 
-export class State {
+class State {
   constructor(grid) {
     this.grid = grid;
     this.neighbors = [];
