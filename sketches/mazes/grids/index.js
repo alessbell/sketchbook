@@ -9,19 +9,19 @@ export class Grid {
     this.configure_cells();
   }
 
-  set_distances(distances) {
-    this.distances = distances;
-    let farthest_id;
-    [farthest_id, this.maximum] = distances.max();
-  }
+  // set_distances(distances) {
+  //   this.distances = distances;
+  //   let farthest_id;
+  //   [farthest_id, this.maximum] = distances.max();
+  // }
 
-  background_color_for(cell) {
-    let distance = this.distances.get_cell(cell);
-    let intensity = ((this.maximum - distance) * 1.0) / this.maximum;
-    let dark = Math.floor(255 * intensity);
-    let bright = Math.floor(128 + 127 * intensity);
-    return `rgb(${dark},${bright},${dark})`;
-  }
+  // background_color_for(cell) {
+  //   let distance = this.distances.get_cell(cell);
+  //   let intensity = ((this.maximum - distance) * 1.0) / this.maximum;
+  //   let dark = Math.floor(255 * intensity);
+  //   let bright = Math.floor(128 + 127 * intensity);
+  //   return `rgb(${dark},${bright},${dark})`;
+  // }
 
   prepare_grid() {
     this.grid = new Array(this.rows);
@@ -135,8 +135,8 @@ export class Grid {
       // ctx.beginPath();
       // ctx.rect(x1, y1, x2, y2);
       // ctx.stroke();
-      ctx.fillStyle = this.background_color_for(cell);
-      ctx.fillRect(x1, y1, x2, y2);
+      // ctx.fillStyle = this.background_color_for(cell);
+      // ctx.fillRect(x1, y1, x2, y2);
 
       if (!cell.north) {
         ctx.moveTo(x1, y1);
@@ -190,5 +190,47 @@ export class Grid {
     }
 
     return list;
+  }
+}
+
+export class MaskedGrid extends Grid {
+  constructor(mask) {
+    super(mask.rows, mask.columns);
+    this.mask = mask;
+
+    // this.rows = rows
+    // this.columns = columns
+
+    this.prepare_grid();
+    this.configure_cells();
+  }
+
+  prepare_grid() {
+    if (!this.mask) return;
+
+    this.grid = new Array(this.rows);
+    for (let i = 0; i < this.rows; i += 1) {
+      this.grid[i] = new Array(this.columns);
+      for (let j = 0; j < this.columns; j += 1) {
+        if (this.mask.get_bits(i, j)) this.grid[i][j] = new Cell(i, j);
+      }
+    }
+  }
+
+  configure_cells() {
+    if (!this.mask) return;
+
+    super.configure_cells();
+  }
+
+  get_random_cell() {
+    let row, column;
+    [row, column] = this.mask.random_location();
+
+    return this.get_cell(row, column);
+  }
+
+  size() {
+    return this.mask.count();
   }
 }
