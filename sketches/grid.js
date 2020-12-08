@@ -73,6 +73,7 @@ const sketch = (context) => {
       posY = posY + elementHeight + marginBetweenElements;
     }
 
+    console.log(lines);
     return [
       context.canvas,
       {

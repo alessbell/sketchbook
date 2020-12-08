@@ -23,7 +23,6 @@ const sketch = () => {
   let grid = new Grid(45, 32);
 
   maze.on(grid);
-  // console.log(grid.toString());
 
   let start = grid.get_cell(
     Math.floor(grid.rows / 2),
